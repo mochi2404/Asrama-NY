@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
+  if (!['GET', 'POST'].includes(req.method)) {
+    res.setHeader('Allow', 'GET, POST');
     return res.status(405).json({ success: false, message: 'Method not allowed' });
   }
 
@@ -10,10 +10,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch(`${backendUrl}/api/backend`, {
-      method: 'POST',
-      headers: { 'Content-Type': req.headers['content-type'] || 'application/json' },
-      body: JSON.stringify(req.body),
+    const isHealthCheck = req.method === 'GET';
+    const response = await fetch(`${backendUrl}${isHealthCheck ? '/api/health' : '/api/backend'}`, {
+      method: req.method,
+      ...(isHealthCheck ? {} : {
+        headers: { 'Content-Type': req.headers['content-type'] || 'application/json' },
+        body: JSON.stringify(req.body),
+      }),
       signal: AbortSignal.timeout(25000),
     });
     const body = await response.text();
