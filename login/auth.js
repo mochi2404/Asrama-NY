@@ -43,7 +43,7 @@ async function handleFormSubmit(event) {
         ? `Server mengirim respons yang bukan JSON (HTTP ${response.status}): ${detail}`
         : `Server mengirim respons kosong atau tidak valid (HTTP ${response.status}).`);
     }
-    if (!response.ok || !result.success) throw new Error(result.error || 'Tidak dapat menghubungi server.');
+    if (!response.ok || !result.success) throw new Error(result.error || result.message || 'Tidak dapat menghubungi server.');
     const expectedRole = currentRole === 'guru' ? 'Guru' : 'Admin';
     if (result.data.user?.role !== expectedRole) {
       throw new Error(currentRole === 'guru' ? 'Akun ini bukan akun guru.' : 'Akun ini bukan akun administrator.');
